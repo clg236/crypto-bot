@@ -1,0 +1,4 @@
+1. refactoring (try to code as much ES6 as possible)
+    - clean up current code
+    - database methods (library)
+    - slack API methods (library)
