@@ -1,4 +1,4 @@
-import { addUser } from "./db";
+import { addUser } from "./db.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
 const require = createRequire(import.meta.url);
