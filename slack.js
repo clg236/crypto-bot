@@ -13,7 +13,7 @@ export const app = new App({
 });
 
 // our SLACK API calls
-app.message('Hey', async ({ message, say }) => {
+app.message('Hello', async ({ message, say }) => {
     await say(`Hello, <@${message.user}>`);
 });
 
