@@ -1,3 +1,4 @@
+import { addUser } from "./db";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
 const require = createRequire(import.meta.url);
@@ -18,6 +19,11 @@ app.message('Hey', async ({ message, say }) => {
 
 app.message('Bye', async ({ message, say }) => {
     await say(`Goodbye!`);
+});
+
+app.message("", async ({ message, say }) => {
+    // addUser(message.user, "name unknown");
+    await say(`Logging message to db!`);
 });
 
 app.command('/register', async ({ command, ack, respond }) => {

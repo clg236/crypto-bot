@@ -1,5 +1,5 @@
 import { app } from "./slack.js";
-import { writeData } from './db.js' // OUR DB CRUD FUNCTIONS
+import { addUser } from './db.js' // OUR DB CRUD FUNCTIONS
 
 // start the application
 const startApp = async () => {
@@ -7,6 +7,8 @@ const startApp = async () => {
   console.log("⚡️ Bolt app is running!");
 };
 
-writeData('clg236', 'Christian Grewell')
+// addUser('clg236', 'Christian G');
+// addUser('alt9035',"Alex T");
+
 startApp();
 
