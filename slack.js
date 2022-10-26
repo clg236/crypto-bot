@@ -22,8 +22,8 @@ app.message('Bye', async ({ message, say }) => {
 });
 
 app.message("", async ({ message, say }) => {
-    addUser(message.user, "name unknown");
-    addMessage(message.user, message.time, message.text, 0);
+    addUser(message.user, message.user_profile.display_name);
+    addMessage(message.user, message.ts, message.text, 0);
     await say(`Logging message to db!`);
 });
 
