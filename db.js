@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, child, update, remove, onValue, orderByChild } from "firebase/database";
+import { getDatabase, ref, set, child, update, remove, onValue, orderByChild, get } from "firebase/database";
 
 dotenv.config()
 
@@ -15,7 +15,7 @@ const firebaseConfig = {
     measurementId: process.env.measurementId,
   };
 
-const firebase = initializeApp(firebaseConfig); //todo: can we error out if there's an issue initializing the DB?
+initializeApp(firebaseConfig); //todo: can we error out if there's an issue initializing the DB?
 
 //our db ref
 const db = getDatabase();
@@ -34,26 +34,49 @@ export const addUser = (userId, name) => {
       });
 }
 
-export const addMessage = (id, user, name, messageText) => {
-  const message = {
-    user: user,
+export const addMessage = (messageId, userId, name, messageText) => {
+
+  //userExists(userId, name)
+  set(ref(db, `messages/${messageId}`), {
+    user: userId,
     name: name,
     message: messageText,
-  }
-
-  set(ref(db, 'messages/'+ id), {
-    message
-  }).then(() => {
-    console.log('message written');
-  }).catch((error) => {
-    console.log(error);
-  });
+  })
+  .then(() => console.log('message written'))
+  .catch((error) => console.log(error));
 }
 
-// Listen for DB changes
-const messageRef = ref(db, 'messages/');
+// add reactions to existing messages
+export const addReactions = (messageId, reactions) => {
+  reactions.map((reaction) => {
+    set(ref(db, `messages/${messageId}/reactions/${reaction.name}`), {
+      count: reaction.count,
+      users: reaction.users,
+    })
+    .then(() => console.log('reactions added'))
+    .catch((error) => console.log(error));
+  })
+ 
+}
 
-onValue(messageRef, (snapshot) => {
-  const data = snapshot.val();
-  console.log(data)
+// Listen for important DB changes
+const userRef = ref(db, 'users/')
+onValue(userRef, (snapshot) => {
+  if (snapshot.exists()) {
+    const data = snapshot.val()
+    console.log(`our users are: ${data}`)
+  } else {
+    console.log('there are no users')
+  }
+})
+
+
+get(child(db, `users/123456`)).then((snapshot) => {
+  if (snapshot.exists()) {
+    console.log(snapshot.val());
+  } else {
+    console.log("No data available");
+  }
+}).catch((error) => {
+  console.error(error);
 });

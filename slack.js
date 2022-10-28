@@ -1,4 +1,4 @@
-import { addMessage, addUser } from "./db.js";
+import { addMessage, addUser, addReactions } from "./db.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
 const require = createRequire(import.meta.url);
@@ -23,12 +23,13 @@ app.message('Bye', async ({ message, say }) => {
 
 app.message("", async ({ message, say }) => {
     try {
-        console.log(message)
         let user = await app.client.users.info( { user: message.user })
         console.log(user)
         // add the message to our database
         addMessage(message.client_msg_id, message.user, user.user.name, message.text)
         await say(`Logging message to db!`);
+
+
     } catch (error) {
         console.log(error)
     }
@@ -45,11 +46,40 @@ app.command('/register', async ({ command, ack, respond }) => {
 
 app.event('reaction_added', async ({event, context, client, say}) => {
     try {
+        console.log(event)
         let user = await app.client.users.info( { user: event.user })
+
+        // reacted User is one that was reacted to
         let reactedUser = await app.client.users.info( { user: event.item_user })
-        console.log(user.user.name)
-        console.log(reactedUser.user.name)
-        await say ('nice reaction!')
+        let reactionDetails = await app.client.reactions.list( { user: event.user })
+
+        // find the correct message and insert our reactions
+        const messageId = reactionDetails.items[0].message.client_msg_id
+        const reactions = reactionDetails.items[0].message.reactions
+
+        addReactions(messageId, reactions);
+        await say('nice reaction!')
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+// does the same thing as above, just pushes the array
+app.event('reaction_removed', async ({event, context, client, say}) => {
+    try {
+        console.log(event)
+        let user = await app.client.users.info( { user: event.user })
+
+        // reacted User is one that was reacted to
+        let reactedUser = await app.client.users.info( { user: event.item_user })
+        let reactionDetails = await app.client.reactions.list( { user: event.user })
+
+        // find the correct message and insert our reactions
+        const messageId = reactionDetails.items[0].message.client_msg_id
+        const reactions = reactionDetails.items[0].message.reactions
+
+        addReactions(messageId, reactions);
+        await say('nice reaction!')
     } catch (error) {
         console.log(error)
     }

@@ -1,3 +1,8 @@
-1. when a new message is added, do *something*
+1. when a new message is added, do *something* 
 2. when a new reaction is added, do * something*
 3. when a reply is added, do *something*
+
+
+// TO DOS
+
+1. handle removing reactions from db
