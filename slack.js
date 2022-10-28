@@ -25,8 +25,9 @@ app.message("", async ({ message, say }) => {
     try {
         console.log(message)
         let user = await app.client.users.info( { user: message.user })
-        //addUser(message.user, message.user_profile.display_name);
-        //addMessage(message.user, message.ts, message.text, 0);
+        console.log(user)
+        // add the message to our database
+        addMessage(message.client_msg_id, message.user, user.user.name, message.text)
         await say(`Logging message to db!`);
     } catch (error) {
         console.log(error)
@@ -45,12 +46,11 @@ app.command('/register', async ({ command, ack, respond }) => {
 app.event('reaction_added', async ({event, context, client, say}) => {
     try {
         let user = await app.client.users.info( { user: event.user })
-        console.log(event)
-        console.log(context)
+        let reactedUser = await app.client.users.info( { user: event.item_user })
+        console.log(user.user.name)
+        console.log(reactedUser.user.name)
         await say ('nice reaction!')
     } catch (error) {
         console.log(error)
     }
 })
-
-// Utility Functions

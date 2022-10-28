@@ -1,4 +1,3 @@
-1. refactoring (try to code as much ES6 as possible)
-    - clean up current code
-    - database methods (library)
-    - slack API methods (library)
+1. when a new message is added, do *something*
+2. when a new reaction is added, do * something*
+3. when a reply is added, do *something*

@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, child, update, remove } from "firebase/database";
+import { getDatabase, ref, set, child, update, remove, onValue, orderByChild } from "firebase/database";
 
 dotenv.config()
 
@@ -34,29 +34,26 @@ export const addUser = (userId, name) => {
       });
 }
 
-export const addMessage = (user, name, messageText) => {
-  // how we store messages
-  // message
-    // user
-    // name
-    // messageText
-    // replies
-      // message
-      // user
-      // name
-
-  const messageData = {
-    message: text,
-    reactCount: reactCount,
+export const addMessage = (id, user, name, messageText) => {
+  const message = {
+    user: user,
+    name: name,
+    message: messageText,
   }
-  set(ref(db, 'messages/'+ userId+'/'+time), {
-    messageData
-  })
-  .then(() => {
+
+  set(ref(db, 'messages/'+ id), {
+    message
+  }).then(() => {
     console.log('message written');
-  })
-  .catch((error) => {
+  }).catch((error) => {
     console.log(error);
   });
 }
 
+// Listen for DB changes
+const messageRef = ref(db, 'messages/');
+
+onValue(messageRef, (snapshot) => {
+  const data = snapshot.val();
+  console.log(data)
+});
