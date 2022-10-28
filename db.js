@@ -15,7 +15,7 @@ const firebaseConfig = {
     measurementId: process.env.measurementId,
   };
 
-initializeApp(firebaseConfig); //todo: can we error out if there's an issue initializing the DB?
+const firebase = initializeApp(firebaseConfig); //todo: can we error out if there's an issue initializing the DB?
 
 //our db ref
 const db = getDatabase();
@@ -36,7 +36,7 @@ export const addUser = (userId, name) => {
 
 export const addMessage = (messageId, userId, name, messageText) => {
 
-  //userExists(userId, name)
+  userExists(userId, name)
   set(ref(db, `messages/${messageId}`), {
     user: userId,
     name: name,
@@ -59,24 +59,20 @@ export const addReactions = (messageId, reactions) => {
  
 }
 
-// Listen for important DB changes
-const userRef = ref(db, 'users/')
-onValue(userRef, (snapshot) => {
-  if (snapshot.exists()) {
-    const data = snapshot.val()
-    console.log(`our users are: ${data}`)
-  } else {
-    console.log('there are no users')
-  }
-})
+const userExists = (userId, name) => {
+  const dbRef = ref(getDatabase());
+  get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      console.log(snapshot.val());
+    } else {
+      set(ref(db, `users/${userId}`), {
+        name: name,
+      })
+      .then(() => console.log('message written'))
+      .catch((error) => console.log(error));
+    }
+  }).catch((error) => {
+    console.error(error);
+  });
 
-
-get(child(db, `users/123456`)).then((snapshot) => {
-  if (snapshot.exists()) {
-    console.log(snapshot.val());
-  } else {
-    console.log("No data available");
-  }
-}).catch((error) => {
-  console.error(error);
-});
+}
