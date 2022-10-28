@@ -34,13 +34,22 @@ export const addUser = (userId, name) => {
       });
 }
 
-export const addMessage = (userId, time, text, reactCount) => {
+export const addMessage = (user, name, messageText) => {
   // how we store messages
+  // message
+    // user
+    // name
+    // messageText
+    // replies
+      // message
+      // user
+      // name
+
   const messageData = {
     message: text,
     reactCount: reactCount,
   }
-  set(ref(db, 'users/'+userId+'/'+time), {
+  set(ref(db, 'messages/'+ userId+'/'+time), {
     messageData
   })
   .then(() => {
@@ -50,3 +59,4 @@ export const addMessage = (userId, time, text, reactCount) => {
     console.log(error);
   });
 }
+

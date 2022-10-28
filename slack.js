@@ -22,9 +22,16 @@ app.message('Bye', async ({ message, say }) => {
 });
 
 app.message("", async ({ message, say }) => {
-    addUser(message.user, message.user_profile.display_name);
-    addMessage(message.user, message.ts, message.text, 0);
-    await say(`Logging message to db!`);
+    try {
+        console.log(message)
+        let user = await app.client.users.info( { user: message.user })
+        //addUser(message.user, message.user_profile.display_name);
+        //addMessage(message.user, message.ts, message.text, 0);
+        await say(`Logging message to db!`);
+    } catch (error) {
+        console.log(error)
+    }
+
 });
 
 app.command('/register', async ({ command, ack, respond }) => {
@@ -35,3 +42,15 @@ app.command('/register', async ({ command, ack, respond }) => {
     console.log(`${command.text}`);
 });
 
+app.event('reaction_added', async ({event, context, client, say}) => {
+    try {
+        let user = await app.client.users.info( { user: event.user })
+        console.log(event)
+        console.log(context)
+        await say ('nice reaction!')
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+// Utility Functions
