@@ -1,4 +1,5 @@
-import { addMessage, addUser, addReactions } from "./db.js";
+import { addMessage, addUser, addReactions, updateScore } from "./db.js";
+import { processReaction } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
 const require = createRequire(import.meta.url);
@@ -29,7 +30,6 @@ app.message("", async ({ message, say }) => {
         addMessage(message.client_msg_id, message.user, user.user.name, message.text)
         await say(`Logging message to db!`);
 
-
     } catch (error) {
         console.log(error)
     }
@@ -44,6 +44,7 @@ app.command('/register', async ({ command, ack, respond }) => {
     console.log(`${command.text}`);
 });
 
+// reaction added
 app.event('reaction_added', async ({event, context, client, say}) => {
     try {
         console.log(event)
@@ -57,7 +58,12 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         const messageId = reactionDetails.items[0].message.client_msg_id
         const reactions = reactionDetails.items[0].message.reactions
 
-        addReactions(messageId, reactions);
+        // add to the database
+        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
+        
+
+        
+        
         await say('nice reaction!')
     } catch (error) {
         console.log(error)
@@ -78,8 +84,8 @@ app.event('reaction_removed', async ({event, context, client, say}) => {
         const messageId = reactionDetails.items[0].message.client_msg_id
         const reactions = reactionDetails.items[0].message.reactions
 
-        addReactions(messageId, reactions);
-        await say('nice reaction!')
+        // removeReactions function
+        await say('awww reaction removed!')
     } catch (error) {
         console.log(error)
     }

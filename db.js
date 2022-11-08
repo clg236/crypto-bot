@@ -35,7 +35,6 @@ export const addUser = (userId, name) => {
 }
 
 export const addMessage = (messageId, userId, name, messageText) => {
-
   userExists(userId, name)
   set(ref(db, `messages/${messageId}`), {
     user: userId,
@@ -47,26 +46,33 @@ export const addMessage = (messageId, userId, name, messageText) => {
 }
 
 // add reactions to existing messages
-export const addReactions = (messageId, reactions) => {
-  reactions.map((reaction) => {
-    set(ref(db, `messages/${messageId}/reactions/${reaction.name}`), {
-      count: reaction.count,
-      users: reaction.users,
+export const addReactions  = (messageId, userId, name, reactions) => {
+  return new Promise((resolve, reject) => {
+    userExists(userId, name)
+
+    reactions.map((reaction) => {
+      set(ref(db, `messages/${messageId}/reactions/${reaction.name}`), {
+        count: reaction.count,
+        users: reaction.users,
+      })
+      .then(() => {
+      })
+      .catch((error) => console.log(error));
     })
-    .then(() => console.log('reactions added'))
-    .catch((error) => console.log(error));
   })
- 
 }
 
 const userExists = (userId, name) => {
   const dbRef = ref(getDatabase());
   get(child(dbRef, `users/${userId}`)).then((snapshot) => {
     if (snapshot.exists()) {
+      // the user exists
       console.log(snapshot.val());
+      console.log('user already exists!')
     } else {
       set(ref(db, `users/${userId}`), {
         name: name,
+        score: 0,
       })
       .then(() => console.log('message written'))
       .catch((error) => console.log(error));
@@ -74,5 +80,16 @@ const userExists = (userId, name) => {
   }).catch((error) => {
     console.error(error);
   });
+}
 
+export const updateScore = (userId, amount) => {
+  const dbRef = ref(getDatabase());
+
+  get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    let currentScore = snapshot.val().score
+    update(ref(db, `users/${userId}`), {
+      'score' : currentScore + amount
+    })
+  
+  })
 }

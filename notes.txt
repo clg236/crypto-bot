@@ -6,3 +6,6 @@
 // TO DOS
 
 1. handle removing reactions from db
+2. show score using a slash command
+3. realtime score updates on frontend
+4. what is something that is fun for people that doesn't cost us lots of money
