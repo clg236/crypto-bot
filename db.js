@@ -93,3 +93,12 @@ export const updateScore = (userId, amount) => {
   
   })
 }
+
+export const getScore = async (userId) => {
+  const dbRef = ref(getDatabase());
+  get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    let score = snapshot.val().score;
+    console.log(score);
+    return score;
+  })
+}

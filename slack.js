@@ -1,4 +1,4 @@
-import { addMessage, addUser, addReactions, updateScore } from "./db.js";
+import { addMessage, addUser, addReactions, updateScore, getScore } from "./db.js";
 import { processReaction } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
@@ -43,6 +43,15 @@ app.command('/register', async ({ command, ack, respond }) => {
     await respond(`${command.text}`);
     console.log(`${command.text}`);
 });
+
+app.command('/score', async ({ command, ack, respond }) => {
+    // Acknowledge command request (I have no idea what this is)
+    await ack();
+
+    let userScore = await getScore(command.text)
+    console.log('this should be called after '+ userScore);
+    await respond(`@${command.text}, your score is ${userScore}`);
+})
 
 // reaction added
 app.event('reaction_added', async ({event, context, client, say}) => {
