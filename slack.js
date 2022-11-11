@@ -1,5 +1,5 @@
 import { addMessage, addUser, addReactions, updateScore, getScore } from "./db.js";
-import { processReaction } from "./app.js";
+import { processReaction, battlePairs } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
 const require = createRequire(import.meta.url);
@@ -53,6 +53,18 @@ app.command('/score', async ({ command, ack, respond }) => {
     await respond(`@${command.text}, your score is ${userScore}`);
 })
 
+app.command('/battle', async ({ command, ack, respond }) => {
+    // Acknowledge command request (I have no idea what this is)
+    await ack();
+
+    // get all of our users in the channel (app.client.users.list)
+    let users = await app.client.users.list()
+    console.log(users.members)
+    
+    // pass our users list to the battle_pair() function
+
+
+})
 // reaction added
 app.event('reaction_added', async ({event, context, client, say}) => {
     try {
@@ -67,11 +79,10 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         const messageId = reactionDetails.items[0].message.client_msg_id
         const reactions = reactionDetails.items[0].message.reactions
 
-        // add to the database
-        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
-        
-
-        
+        // check that the message has an image
+            // check if the user has already reacted to this message?
+                // add to the database
+                addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
         
         await say('nice reaction!')
     } catch (error) {

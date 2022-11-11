@@ -18,3 +18,28 @@ export const processReaction = (reactingUser, reactedUser) => {
     updateScore(reactingUser, 5)
 
 }
+
+export const battlePairs = (users) => {
+  // get a count of the user number
+  let userCount = users.length()
+  console.log(`we have ${userCount} users`)
+}
+
+
+// utils
+const createGroups = (users) => {
+  let testUsers = [
+    'christian',
+    'alex',
+    'bob',
+    'fred',
+    'sally',
+    'uber',
+  ]
+
+  let currentIndex = array.length, temporaryValue, randomIndex
+  while (0 !== currentIndex) {
+    //pick a random element
+    let randomindex = Math.floor(Math.random())
+  }
+}
