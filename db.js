@@ -74,6 +74,21 @@ export const addReactions  = (messageId, userId, name, reactions) => {
   })
 }
 
+// TODO there has to be a better way to do this
+export const removeReactions = (messageId, reactions) => {
+  return new Promise((resolve, reject) => {
+    reactions.map((reaction) => {
+      set(ref(db, `messages/${messageId}/reactions/${reaction.name}`), {
+        count: reaction.count,
+        users: reaction.users,
+      })
+      .then(() => {
+      })
+      .catch((error) => console.log(error));
+    })
+  })
+}
+
 
 //TODO put the adduser function into here to make code look less nasty
 const userExists = (userId, name) => {

@@ -1,4 +1,4 @@
-import { addMessage, addUser, addReactions, updateScore, getScore, addImage, getAllScores } from "./db.js";
+import { addMessage, addUser, addReactions, updateScore, getScore, addImage, getAllScores, removeReactions } from "./db.js";
 import { processReaction, battlePairs } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
@@ -103,7 +103,7 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         // check that the message has an image
             // check if the user has already reacted to this message?
                 // add to the database
-        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
+        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id, true))
         
         await say('nice reaction!')
     } catch (error) {
@@ -125,7 +125,9 @@ app.event('reaction_removed', async ({event, context, client, say}) => {
         const messageId = reactionDetails.items[0].message.client_msg_id
         const reactions = reactionDetails.items[0].message.reactions
 
+        console.log(reactions);
         // removeReactions function
+        removeReactions(messageId, reactions).then(processReaction(user.user.id, reactedUser.user.id, false));
         await say('awww reaction removed!')
     } catch (error) {
         console.log(error)

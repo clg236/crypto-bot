@@ -11,11 +11,17 @@ startApp();
 
 // application logic
 
-export const processReaction = (reactingUser, reactedUser) => {
+export const processReaction = (reactingUser, reactedUser, isAdded) => {
   // assumptions:
     // it's easier to react then be reacted to -> reward the content creator more
-    updateScore(reactedUser, 100)
-    updateScore(reactingUser, 5)
+    if (isAdded) {
+      updateScore(reactedUser, 100)
+      updateScore(reactingUser, 5)
+    } else {
+      updateScore(reactedUser, -100)
+      updateScore(reactingUser, -5)
+    }
+
 
 }
 
