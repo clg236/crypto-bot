@@ -75,7 +75,7 @@ app.command('/allscores', async ({command, ack, respond}) => {
 app.command('/highscores', async ({command, ack, respond}) => {
     await ack();
     let scoreDict = await getAllScores();
-
+    let scores = []
     // Create items array
     var items = Object.keys(scoreDict).map(function(key) {
     return [key, scoreDict[key]];
@@ -84,11 +84,19 @@ app.command('/highscores', async ({command, ack, respond}) => {
   
   for (let item in items) {
     console.log(items[item])
-
+    
     //our individual scores
     for (let score in items[item]) {
         console.log(items[item][score])
+        scores[score] = items[item][score]
     }
+
+    // Sort the array based on the second element
+    scores.sort((first, second) => {
+    return second[1] - first[1];
+  });
+  
+    console.log(scores)
 
     // Create a new array with only the first 5 items
     //console.log(items.slice(0, 5));
