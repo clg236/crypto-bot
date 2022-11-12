@@ -65,11 +65,26 @@ app.command('/battle', async ({ command, ack, respond }) => {
 app.command('/allscores', async ({command, ack, respond}) => {
     await ack();
     let scoreDict = await getAllScores();
-    let scoreStr = '';
+    let scoreStr = 'Below are all user scores:\n';
     for (const userId in scoreDict) {
-        scoreStr += `<@${userId}>: ${scoreDict[userId].score}`
+        scoreStr += `<@${userId}>: ${scoreDict[userId].score}\n`
     }
     await respond(scoreStr);
+})
+
+// photo added
+app.event('file_shared', async ({event, context, client, say}) => {
+    try {
+        let user = await app.client.users.info( { user: event.user_id })
+        let photo = await app.client.files.info({ file: event.file_id})
+        let download = photo.file.url_private_download
+
+        addImage(event.file_id, download, user.user.id, user.user.name);
+        
+        await say('amazing photo!')
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 // reaction added
@@ -95,22 +110,6 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         console.log(error)
     }
 })
-
-// photo added
-app.event('file_shared', async ({event, context, client, say}) => {
-    try {
-        let user = await app.client.users.info( { user: event.user_id })
-        let photo = await app.client.files.info({ file: event.file_id})
-        let download = photo.file.url_private_download
-
-        addImage(event.file_id, download, user.user.id, user.user.name);
-        
-        await say('amazing photo!')
-    } catch (error) {
-        console.log(error)
-    }
-})
-
 
 // does the same thing as above, just pushes the array
 app.event('reaction_removed', async ({event, context, client, say}) => {

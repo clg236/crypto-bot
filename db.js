@@ -128,7 +128,7 @@ export const getAllScores = async () => {
   await get(child(dbRef, `users/`)).then((snapshot) => {
     scoreDict = snapshot.val();
   }).catch((error) => {
-    console.log("User has not yet posted anything!");
+    console.log(error);
   });
 
   return scoreDict;
