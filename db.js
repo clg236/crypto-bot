@@ -20,20 +20,6 @@ const firebase = initializeApp(firebaseConfig); //todo: can we error out if ther
 //our db ref
 const db = getDatabase();
 
-// write data to a server (overwrite existing record if it exists)
-// saves each separate student to users/userId
-export const addUser = (userId, name) => {
-    set(ref(db, 'users/' + userId), {
-        username: name,
-      })
-      .then(() => {
-        console.log('data saved!')
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-}
-
 export const addMessage = (messageId, userId, name, messageText) => {
   userExists(userId, name);
   set(ref(db, `messages/${messageId}`), {
@@ -75,17 +61,24 @@ export const addReactions  = (messageId, userId, name, reactions) => {
 }
 
 // TODO there has to be a better way to do this
-export const removeReactions = (messageId, reactions) => {
+export const removeReactions = async (messageId, reactionName, reactingUserId) => {
+  let reactRefString = `messages/${messageId}/reactions/${reactionName}`;
+  let reactCount = 1;
+  console.log(reactRefString);
+  await get(child(ref(db), reactRefString)).then((snapshot) => {
+    reactCount = snapshot.val().count
+    reactCount--;
+    if (reactCount) {
+      update(ref(db, reactRefString), {
+        'count' : reactCount
+      })
+    } else {
+      remove(ref(db, reactRefString));
+    }
+  });
+  
   return new Promise((resolve, reject) => {
-    reactions.map((reaction) => {
-      set(ref(db, `messages/${messageId}/reactions/${reaction.name}`), {
-        count: reaction.count,
-        users: reaction.users,
-      })
-      .then(() => {
-      })
-      .catch((error) => console.log(error));
-    })
+    resolve("It worked!");
   })
 }
 
@@ -97,13 +90,13 @@ const userExists = (userId, name) => {
     if (snapshot.exists()) {
       // the user exists
       // console.log(snapshot.val());
-      console.log('user already exists!')
+      // console.log('user already exists!')
     } else {
       set(ref(db, `users/${userId}`), {
         name: name,
         score: 0,
       })
-      .then(() => console.log('message written'))
+      .then(() => console.log('message written')) // does it make sense to have this line in the userExists function?
       .catch((error) => console.log(error));
     }
   }).catch((error) => {
@@ -119,7 +112,6 @@ export const updateScore = (userId, amount) => {
     update(ref(db, `users/${userId}`), {
       'score' : currentScore + amount
     })
-  
   })
 }
 

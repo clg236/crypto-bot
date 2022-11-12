@@ -1,4 +1,4 @@
-import { addMessage, addUser, addReactions, updateScore, getScore, addImage, getAllScores, removeReactions } from "./db.js";
+import { addMessage, addReactions, updateScore, getScore, addImage, getAllScores, removeReactions } from "./db.js";
 import { processReaction, battlePairs } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
@@ -93,7 +93,6 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         let user = await app.client.users.info( { user: event.user })
 
         // reacted User is one that was reacted to
-        let reactedUser = await app.client.users.info( { user: event.item_user })
         let reactionDetails = await app.client.reactions.list( { user: event.user })
 
         // find the correct message and insert our reactions
@@ -103,9 +102,9 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         // check that the message has an image
             // check if the user has already reacted to this message?
                 // add to the database
-        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id, true))
+        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, event.item_user, true))
         
-        await say('nice reaction!')
+        // await say('nice reaction!')
     } catch (error) {
         console.log(error)
     }
@@ -115,20 +114,16 @@ app.event('reaction_added', async ({event, context, client, say}) => {
 app.event('reaction_removed', async ({event, context, client, say}) => {
     try {
         console.log(event)
-        let user = await app.client.users.info( { user: event.user })
-
         // reacted User is one that was reacted to
-        let reactedUser = await app.client.users.info( { user: event.item_user })
         let reactionDetails = await app.client.reactions.list( { user: event.user })
 
         // find the correct message and insert our reactions
+        // TODO when you remove the only reaction left from a message, it removes ENTIRE MESSAGE from reactionDetails and the following code will give the id of the previous reacted to message
         const messageId = reactionDetails.items[0].message.client_msg_id
-        const reactions = reactionDetails.items[0].message.reactions
 
-        console.log(reactions);
         // removeReactions function
-        removeReactions(messageId, reactions).then(processReaction(user.user.id, reactedUser.user.id, false));
-        await say('awww reaction removed!')
+        removeReactions(messageId, event.reaction, event.item_user).then(processReaction(event.user, event.item_user, false));
+        // await say('awww reaction removed!')
     } catch (error) {
         console.log(error)
     }
