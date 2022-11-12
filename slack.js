@@ -24,7 +24,7 @@ app.message("", async ({ message, say }) => {
             let user = await app.client.users.info( { user: message.user })
             // add the message to our database
             addMessage(message.client_msg_id, message.user, user.user.name, message.text)
-            await say(`Logging message to db!`);
+            // await say(`Logging message to db!`);
 
         } catch (error) {
             console.log(error)

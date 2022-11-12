@@ -123,7 +123,7 @@ export const getScore = async (userId) => {
   }).catch((error) => {
     console.log("User has not yet posted anything!");
   });
-  //TODO Christian, do you know how to look for specific errors or something?
+  //TODO Christian, do you know how to look for specific errors?
   // Right now, I am just assuming the error is that the user has not been added yet
   // I would add the user, but then we need to pass the name to this function too which seems unnecessary
   return score;
