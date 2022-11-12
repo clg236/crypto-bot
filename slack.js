@@ -72,6 +72,40 @@ app.command('/allscores', async ({command, ack, respond}) => {
     await respond(scoreStr);
 })
 
+app.command('/highscores', async ({command, ack, respond}) => {
+    await ack();
+    let scoreDict = await getAllScores();
+
+    // Create items array
+    var items = Object.keys(scoreDict).map(function(key) {
+    return [key, scoreDict[key]];
+  });
+  
+  
+  for (let item in items) {
+    console.log(items[item])
+
+    //our individual scores
+    for (let score in items[item]) {
+        console.log(items[item][score])
+    }
+
+    // Create a new array with only the first 5 items
+    //console.log(items.slice(0, 5));
+
+    // say to the channel
+    
+}
+
+
+
+    let scoreStr = 'Below are all user scores:\n';
+    for (const userId in scoreDict) {
+        scoreStr += `<@${userId}>: ${scoreDict[userId].score}\n`
+    }
+    await respond(scoreStr);
+})
+
 // photo added
 app.event('file_shared', async ({event, context, client, say}) => {
     try {
