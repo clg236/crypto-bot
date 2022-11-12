@@ -1,4 +1,4 @@
-import { addMessage, addUser, addReactions, updateScore, getScore, addImage } from "./db.js";
+import { addMessage, addUser, addReactions, updateScore, getScore, addImage, getAllScores } from "./db.js";
 import { processReaction, battlePairs } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
@@ -60,6 +60,16 @@ app.command('/battle', async ({ command, ack, respond }) => {
     
     // pass our users list to the battle_pair() function
 
+})
+
+app.command('/allscores', async ({command, ack, respond}) => {
+    await ack();
+    let scoreDict = await getAllScores();
+    let scoreStr = '';
+    for (const userId in scoreDict) {
+        scoreStr += `<@${userId}>: ${scoreDict[userId].score}`
+    }
+    await respond(scoreStr);
 })
 
 // reaction added

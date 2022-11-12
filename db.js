@@ -121,3 +121,15 @@ export const getScore = async (userId) => {
   // I would add the user, but then we need to pass the name to this function too which seems unnecessary
   return score;
 }
+
+export const getAllScores = async () => {
+  const dbRef = ref(getDatabase());
+  let scoreDict = {};
+  await get(child(dbRef, `users/`)).then((snapshot) => {
+    scoreDict = snapshot.val();
+  }).catch((error) => {
+    console.log("User has not yet posted anything!");
+  });
+
+  return scoreDict;
+}
