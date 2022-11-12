@@ -95,11 +95,9 @@ app.command('/highscores', async ({command, ack, respond}) => {
     scores.sort((first, second) => {
     return second[1] - first[1];
   });
-  
-    console.log(scores)
 
     // Create a new array with only the first 5 items
-    //console.log(items.slice(0, 5));
+    console.log(scores.slice(0, 5));
 
     // say to the channel
     
