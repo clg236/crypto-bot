@@ -1,4 +1,4 @@
-import { addMessage, addUser, addReactions, updateScore, getScore } from "./db.js";
+import { addMessage, addUser, addReactions, updateScore, getScore, addImage } from "./db.js";
 import { processReaction, battlePairs } from "./app.js";
 import { createRequire } from "module";
 import * as dotenv from 'dotenv'
@@ -18,22 +18,18 @@ app.message('Hello', async ({ message, say }) => {
     await say(`Hello, <@${message.user}>`);
 });
 
-app.message('Bye', async ({ message, say }) => {
-    await say(`Goodbye!`);
-});
-
 app.message("", async ({ message, say }) => {
-    try {
-        let user = await app.client.users.info( { user: message.user })
-        console.log(user)
-        // add the message to our database
-        addMessage(message.client_msg_id, message.user, user.user.name, message.text)
-        await say(`Logging message to db!`);
+    if (message && message.text) {
+        try {
+            let user = await app.client.users.info( { user: message.user })
+            // add the message to our database
+            addMessage(message.client_msg_id, message.user, user.user.name, message.text)
+            await say(`Logging message to db!`);
 
-    } catch (error) {
-        console.log(error)
+        } catch (error) {
+            console.log(error)
+        }
     }
-
 });
 
 app.command('/register', async ({ command, ack, respond }) => {
@@ -48,9 +44,10 @@ app.command('/score', async ({ command, ack, respond }) => {
     // Acknowledge command request (I have no idea what this is)
     await ack();
 
-    let userScore = await getScore(command.text)
-    console.log('this should be called after '+ userScore);
-    await respond(`@${command.text}, your score is ${userScore}`);
+    console.log(await app.client.users.list());
+    let userScore = await getScore(command.user_id)
+
+    await respond(`<@${command.user_id}>, your score is ${userScore}`);
 })
 
 app.command('/battle', async ({ command, ack, respond }) => {
@@ -63,12 +60,11 @@ app.command('/battle', async ({ command, ack, respond }) => {
     
     // pass our users list to the battle_pair() function
 
-
 })
+
 // reaction added
 app.event('reaction_added', async ({event, context, client, say}) => {
     try {
-        console.log(event)
         let user = await app.client.users.info( { user: event.user })
 
         // reacted User is one that was reacted to
@@ -82,13 +78,29 @@ app.event('reaction_added', async ({event, context, client, say}) => {
         // check that the message has an image
             // check if the user has already reacted to this message?
                 // add to the database
-                addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
+        addReactions(messageId, user.user.id, user.user.name, reactions).then(processReaction(user.user.id, reactedUser.user.id))
         
         await say('nice reaction!')
     } catch (error) {
         console.log(error)
     }
 })
+
+// photo added
+app.event('file_shared', async ({event, context, client, say}) => {
+    try {
+        let user = await app.client.users.info( { user: event.user_id })
+        let photo = await app.client.files.info({ file: event.file_id})
+        let download = photo.file.url_private_download
+
+        addImage(event.file_id, download, user.user.id, user.user.name);
+        
+        await say('amazing photo!')
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 
 // does the same thing as above, just pushes the array
 app.event('reaction_removed', async ({event, context, client, say}) => {

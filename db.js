@@ -35,7 +35,7 @@ export const addUser = (userId, name) => {
 }
 
 export const addMessage = (messageId, userId, name, messageText) => {
-  userExists(userId, name)
+  userExists(userId, name);
   set(ref(db, `messages/${messageId}`), {
     user: userId,
     name: name,
@@ -45,7 +45,19 @@ export const addMessage = (messageId, userId, name, messageText) => {
   .catch((error) => console.log(error));
 }
 
+export const addImage = (fileId, imageUrl, userId, name) => {
+  userExists(userId, name);
+  set(ref(db, `images/${fileId}`), {
+    imageUrl: imageUrl,
+    user: userId,
+    name: name,
+  })
+  .then(() => console.log('image saved'))
+  .catch((error => console.log(error)));
+}
+
 // add reactions to existing messages
+// TODO refactor this to be async await?
 export const addReactions  = (messageId, userId, name, reactions) => {
   return new Promise((resolve, reject) => {
     userExists(userId, name)
@@ -62,12 +74,14 @@ export const addReactions  = (messageId, userId, name, reactions) => {
   })
 }
 
+
+//TODO put the adduser function into here to make code look less nasty
 const userExists = (userId, name) => {
   const dbRef = ref(getDatabase());
   get(child(dbRef, `users/${userId}`)).then((snapshot) => {
     if (snapshot.exists()) {
       // the user exists
-      console.log(snapshot.val());
+      // console.log(snapshot.val());
       console.log('user already exists!')
     } else {
       set(ref(db, `users/${userId}`), {
@@ -96,9 +110,14 @@ export const updateScore = (userId, amount) => {
 
 export const getScore = async (userId) => {
   const dbRef = ref(getDatabase());
-  get(child(dbRef, `users/${userId}`)).then((snapshot) => {
-    let score = snapshot.val().score;
-    console.log(score);
-    return score;
-  })
+  let score = 0;
+  await get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    score = snapshot.val().score;
+  }).catch((error) => {
+    console.log("User has not yet posted anything!");
+  });
+  //TODO Christian, do you know how to look for specific errors or something?
+  // Right now, I am just assuming the error is that the user has not been added yet
+  // I would add the user, but then we need to pass the name to this function too which seems unnecessary
+  return score;
 }
